@@ -18,6 +18,7 @@ Esta aula prática tem como objetivo aplicar modelos de regressão em dados de m
 library(tidyverse)
 library(tidymodels)
 library(ggplot2)
+library(ggpmisc)
 
 load("dados_rhc_17_tratados.Rdata")
 ```
@@ -73,16 +74,26 @@ linear_metrics <- metrics(data = linear_preds,
                           truth = idade,
                           estimate = .pred)
 linear_metrics
-
 ```
 
 ### Visualizaçãoo
 
 ```{r}
 ggplot(train_data, aes(x = estadiamento, y = idade)) +
-  geom_point() +
-  geom_smooth(method = "lm", col = "deeppink3") +
-  labs(title = "Regressão Linear Simples", x = "Estadiamento", y = "Idade")
+  geom_point(color = "blue", size = 2, alpha = 0.8) +  # Pontos
+  geom_smooth(method = "lm", color = "red", se = TRUE) +  # Linha de regressão com IC
+  stat_poly_eq(
+    aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE,
+    color = "black"
+  ) +  # Equação e R² ajustado
+  labs(
+    title = "Gráfico de Regressão",
+    x = "Estadiamento Clínico",
+    y = "Idade ao Diagnóstico"
+  ) +
+  theme_minimal(base_size = 14)  # Tema minimalista
 ```
 
 ## Regressão Linear Múltipla
