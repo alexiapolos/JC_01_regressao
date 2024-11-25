@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="LiaaOnco">
+<meta name="dcterms.date" content="2024-11-25">
+
+<title>Jornal Club 1: Modelos de Regressão</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="JC_01_regressao_files/libs/clipboard/clipboard.min.js"></script>
+<script src="JC_01_regressao_files/libs/quarto-html/quarto.js"></script>
+<script src="JC_01_regressao_files/libs/quarto-html/popper.min.js"></script>
+<script src="JC_01_regressao_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="JC_01_regressao_files/libs/quarto-html/anchor.min.js"></script>
+<link href="JC_01_regressao_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="JC_01_regressao_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="JC_01_regressao_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="JC_01_regressao_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="JC_01_regressao_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Jornal Club 1: Modelos de Regressão</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>LiaaOnco </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 25, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introdução" class="level2">
+<h2 class="anchored" data-anchor-id="introdução">Introdução</h2>
+<p>Aplicação prática da discussão realizada no Journal Club.</p>
+<p>Emprego de dados de mundo real em oncologia, do registro hospitalar do cancer. Análise comparativa de três tipos de regressão aplicados a dados de oncologia: regressão linear simples, regressão múltipla e regressão não linear. O objetivo é prever a variável <code>idade</code> com base em diferentes fatores clínicos e demográficos.</p>
+</section>
+<section id="carregamento-de-dados-e-pacotes" class="level2">
+<h2 class="anchored" data-anchor-id="carregamento-de-dados-e-pacotes">Carregamento de dados e pacotes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: pacote 'ggplot2' foi compilado no R versão 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.2.0 ──
+✔ broom        1.0.6     ✔ rsample      1.2.1
+✔ dials        1.3.0     ✔ tune         1.2.1
+✔ infer        1.0.7     ✔ workflows    1.1.4
+✔ modeldata    1.4.0     ✔ workflowsets 1.1.0
+✔ parsnip      1.2.1     ✔ yardstick    1.3.1
+✔ recipes      1.1.0     
+── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ scales::discard() masks purrr::discard()
+✖ dplyr::filter()   masks stats::filter()
+✖ recipes::fixed()  masks stringr::fixed()
+✖ dplyr::lag()      masks stats::lag()
+✖ yardstick::spec() masks readr::spec()
+✖ recipes::step()   masks stats::step()
+• Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"dados_rhc_17_tratados.Rdata"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>You can add options to executable code like this</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(subset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   315547 obs. of  19 variables:
+ $ ID                        : int  1 2 3 4 5 6 7 8 9 10 ...
+ $ etnia                     : Factor w/ 3 levels "Amarelos e indígena",..: 3 2 2 2 2 2 2 2 2 2 ...
+ $ cacon_unacon              : Factor w/ 3 levels "CACON","Outra",..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ topografia_loc_primaria_3d: Factor w/ 70 levels "Amígdala","Anus e canal anal",..: 28 28 28 28 54 28 28 28 50 8 ...
+ $ morfologia                : Factor w/ 658 levels "Adamantinoma de ossos longos",..: 148 224 224 148 54 148 148 148 449 54 ...
+ $ tratamento_inicial        : Factor w/ 5 levels "Cirurgia","Nenhum",..: 3 3 4 4 3 3 3 3 4 4 ...
+ $ idade                     : num  54 66 77 46 72 46 57 75 53 56 ...
+ $ estadiamento              : Factor w/ 5 levels "0","I","II","III",..: 3 4 4 3 4 3 3 3 3 4 ...
+ $ tipo_caso                 : Factor w/ 2 levels "Analítico","Não analítico": 1 1 1 1 1 1 1 1 1 1 ...
+ $ sexo                      : Factor w/ 2 levels "Masc","Fem": 2 2 2 2 1 2 2 2 1 2 ...
+ $ estado_residencia         : Factor w/ 27 levels "AC","AL","AM",..: 23 23 23 23 23 23 23 23 23 23 ...
+ $ regiao                    : Factor w/ 5 levels "Centro-Oeste",..: 5 5 5 5 5 5 5 5 5 5 ...
+ $ tumores_agrupado          : Factor w/ 6 levels "Mama e Ginecológicos",..: 1 1 1 1 6 1 1 1 2 1 ...
+ $ faixa_etaria              : Factor w/ 5 levels "31-40 anos","41-50 anos",..: 3 4 5 2 5 2 3 5 3 3 ...
+ $ hist_familiar             : Factor w/ 2 levels "Não","Sim": NA NA NA NA NA NA NA NA NA NA ...
+ $ tabagismo                 : Factor w/ 3 levels "Ex-tabagista",..: NA NA NA NA NA NA NA NA NA NA ...
+ $ status_doenca_final_trat  : Factor w/ 4 levels "Doença ativa",..: NA NA NA NA NA NA NA NA NA NA ...
+ $ dtdiag_dtinitrat          : num  0 58 200 22 24 39 356 377 185 112 ...
+ $ lei60_respeitou           : Factor w/ 2 levels "Não","Sim": 2 2 1 2 2 2 1 1 1 1 ...
+ - attr(*, "data_types")= chr [1:46] "C" "C" "C" "C" ...</code></pre>
+</div>
+</div>
+</section>
+<section id="particionamento" class="level2">
+<h2 class="anchored" data-anchor-id="particionamento">Particionamento</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>data_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(subset, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> <span class="fu">training</span>(data_split)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">testing</span>(data_split)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(train_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 252437     19</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(test_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 63110    19</code></pre>
+</div>
+</div>
+</section>
+<section id="regressão-linear-simples" class="level2">
+<h2 class="anchored" data-anchor-id="regressão-linear-simples">Regressão Linear Simples</h2>
+<p><strong>Objetivo:</strong> Avaliar a relação entre o estadiamento clínico (<code>estadiamento</code>) e a idade (<code>idade</code>) ao diagnóstico.</p>
+<section id="modelagem" class="level3">
+<h3 class="anchored" data-anchor-id="modelagem">Modelagem</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>linear_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(idade <span class="sc">~</span> estadiamento, <span class="at">data =</span> train_data)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>linear_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>linear_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(linear_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(linear_model)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>linear_fit <span class="ot">&lt;-</span> linear_workflow <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="at">data =</span> train_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="resultados" class="level3">
+<h3 class="anchored" data-anchor-id="resultados">Resultados</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(linear_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  term            estimate std.error statistic   p.value
+  &lt;chr&gt;              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)        53.3      0.170     313.  0        
+2 estadiamentoI       9.64     0.187      51.6 0        
+3 estadiamentoII      8.65     0.188      46.0 0        
+4 estadiamentoIII     6.90     0.190      36.4 3.73e-288
+5 estadiamentoIV      8.99     0.188      47.8 0        </code></pre>
+</div>
+</div>
+</section>
+<section id="teste-do-modelo" class="level3">
+<h3 class="anchored" data-anchor-id="teste-do-modelo">Teste do modelo</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>linear_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(linear_fit, test_data) <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test_data)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>linear_metrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(<span class="at">data =</span> linear_preds,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">truth =</span> idade,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">estimate =</span> .pred)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>linear_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard     14.4   
+2 rsq     standard      0.0168
+3 mae     standard     11.6   </code></pre>
+</div>
+</div>
+</section>
+<section id="visualizaçãoo" class="level3">
+<h3 class="anchored" data-anchor-id="visualizaçãoo">Visualizaçãoo</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(train_data, <span class="fu">aes</span>(<span class="at">x =</span> estadiamento, <span class="at">y =</span> idade)) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">col =</span> <span class="st">"deeppink3"</span>) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Regressão Linear Simples"</span>, <span class="at">x =</span> <span class="st">"Estadiamento"</span>, <span class="at">y =</span> <span class="st">"Idade"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 185 rows containing non-finite outside the scale range
+(`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 185 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="JC_01_regressao_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="regressão-linear-múltipla" class="level2">
+<h2 class="anchored" data-anchor-id="regressão-linear-múltipla">Regressão Linear Múltipla</h2>
+<p><strong>Objetivo:</strong> Avaliar a relação de múltiplos fatores (<code>tabagismo</code>, <code>sexo</code>, e <code>estadiamento</code>) com a idade ao diagnóstico.</p>
+<section id="modelagem-1" class="level3">
+<h3 class="anchored" data-anchor-id="modelagem-1">Modelagem</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>multiple_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(idade <span class="sc">~</span> tabagismo <span class="sc">+</span> sexo <span class="sc">+</span> estadiamento, <span class="at">data =</span> train_data)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>multiple_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(multiple_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(linear_model)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>multiple_fit <span class="ot">&lt;-</span> multiple_workflow <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="at">data =</span> train_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="resultados-1" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-1">Resultados</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(multiple_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 5
+  term                     estimate std.error statistic   p.value
+  &lt;chr&gt;                       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)                 59.0      0.300     197.  0        
+2 tabagismoNunca tabagista    -3.69     0.139     -26.6 7.59e-155
+3 tabagismoTabagista ativo    -3.95     0.164     -24.1 2.84e-127
+4 sexoFem                     -6.06     0.118     -51.2 0        
+5 estadiamentoI                9.20     0.297      31.0 1.15e-209
+6 estadiamentoII               8.40     0.291      28.9 3.18e-182
+7 estadiamentoIII              7.32     0.290      25.2 7.06e-140
+8 estadiamentoIV               8.33     0.292      28.6 3.71e-178</code></pre>
+</div>
+</div>
+</section>
+<section id="teste-do-modelo-1" class="level3">
+<h3 class="anchored" data-anchor-id="teste-do-modelo-1">Teste do modelo</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>multiple_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(multiple_fit, test_data) <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test_data)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>multiple_metrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(<span class="at">data =</span> multiple_preds, <span class="at">truth =</span> idade, <span class="at">estimate =</span> .pred)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>multiple_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard     13.5   
+2 rsq     standard      0.0860
+3 mae     standard     10.8   </code></pre>
+</div>
+</div>
+</section>
+<section id="visualização" class="level3">
+<h3 class="anchored" data-anchor-id="visualização">Visualização</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>residuals <span class="ot">&lt;-</span> <span class="fu">augment</span>(multiple_fit, <span class="at">new_data =</span> train_data)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(residuals, <span class="fu">aes</span>(.pred, .resid)) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Resíduos da Regressão Múltipla"</span>, <span class="at">x =</span> <span class="st">"Fitted Values"</span>, <span class="at">y =</span> <span class="st">"Resíduos"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 192206 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="JC_01_regressao_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="regressão-não-linear" class="level2">
+<h2 class="anchored" data-anchor-id="regressão-não-linear">Regressão Não-Linear</h2>
+<p><strong>Objetivo:</strong> Modelar a relação não linear entre a idade e o número de diagnósticos por faixa etária usando uma curva polinomial.</p>
+<section id="preparação-dos-dados" class="level3">
+<h3 class="anchored" data-anchor-id="preparação-dos-dados">Preparação dos dados</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>agg_data <span class="ot">&lt;-</span> train_data <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(faixa_etaria) <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">idade_media =</span> <span class="fu">mean</span>(idade, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(agg_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  faixa_etaria    count idade_media
+  &lt;fct&gt;           &lt;int&gt;       &lt;dbl&gt;
+1 31-40 anos      16612        36.1
+2 41-50 anos      29985        46.0
+3 51-60 anos      52990        55.9
+4 61-70 anos      66739        65.5
+5 Mais de 70 anos 73871        78.4
+6 &lt;NA&gt;            12240        19.1</code></pre>
+</div>
+</div>
+</section>
+<section id="modelagem-2" class="level3">
+<h3 class="anchored" data-anchor-id="modelagem-2">Modelagem</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando a receita com uma transformação polinomial</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>nonlinear_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(idade_media <span class="sc">~</span> count, <span class="at">data =</span> agg_data) <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_poly</span>(count, <span class="at">degree =</span> <span class="dv">2</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando o workflow</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>nonlinear_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(nonlinear_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>))</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustando o modelo aos dados agregados</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>nonlinear_fit <span class="ot">&lt;-</span> nonlinear_workflow <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="at">data =</span> agg_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="resultados-2" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-2">Resultados</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nonlinear_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term         estimate std.error statistic  p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)     50.2       2.90    17.3   0.000423
+2 count_poly_1    45.7       7.12     6.42  0.00766 
+3 count_poly_2    -1.99      7.12    -0.280 0.798   </code></pre>
+</div>
+</div>
+</section>
+<section id="teste-do-modelo-2" class="level3">
+<h3 class="anchored" data-anchor-id="teste-do-modelo-2">Teste do modelo</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Previsões para o conjunto agregado</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>agg_data <span class="ot">&lt;-</span> agg_data <span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pred =</span> <span class="fu">predict</span>(nonlinear_fit, <span class="at">new_data =</span> agg_data)<span class="sc">$</span>.pred)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualização do ajuste</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(agg_data, <span class="fu">aes</span>(<span class="at">x =</span> count, <span class="at">y =</span> idade_media)) <span class="sc">+</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> pred), <span class="at">color =</span> <span class="st">"deeppink3"</span>) <span class="sc">+</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Regressão Não Linear"</span>,</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Número de Registros por Faixa Etária"</span>,</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Idade Média"</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="JC_01_regressao_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="visualização-1" class="level3">
+<h3 class="anchored" data-anchor-id="visualização-1">Visualização</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(train_data, <span class="fu">aes</span>(<span class="at">x =</span> faixa_etaria, <span class="at">y =</span> idade)) <span class="sc">+</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">2</span>), <span class="at">col =</span> <span class="st">"deeppink3"</span>) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Regressão Não Linear"</span>, <span class="at">x =</span> <span class="st">"Faixa Etária"</span>, <span class="at">y =</span> <span class="st">"Idade"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 185 rows containing non-finite outside the scale range
+(`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 185 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="JC_01_regressao_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="comparação-entre-modelos" class="level2">
+<h2 class="anchored" data-anchor-id="comparação-entre-modelos">Comparação entre modelos</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  linear_metrics <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">"Linear"</span>),</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  multiple_metrics <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">"Múltiplo"</span>))</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>comparison</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  .metric .estimator .estimate Model   
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;   
+1 rmse    standard     14.4    Linear  
+2 rsq     standard      0.0168 Linear  
+3 mae     standard     11.6    Linear  
+4 rmse    standard     13.5    Múltiplo
+5 rsq     standard      0.0860 Múltiplo
+6 mae     standard     10.8    Múltiplo</code></pre>
+</div>
+</div>
+</section>
+<section id="discussão" class="level2">
+<h2 class="anchored" data-anchor-id="discussão">Discussão</h2>
+<p>Possíveis discussões</p>
+<ul>
+<li><p>O modelo <strong>regressão linear simples</strong> mostrou que o estadiamento tem uma relação direta com a idade ao diagnóstico.</p></li>
+<li><p>A <strong>regressão múltipla</strong> evidenciou como múltiplos fatores afetam a idade de forma combinada.</p></li>
+<li><p>O modelo <strong>não linear</strong> capturou melhor a relação complexa entre faixa etária e idade.</p></li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
