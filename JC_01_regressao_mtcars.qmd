@@ -1,0 +1,194 @@
+---
+title: "Journal Club 1: Modelos de regressão - banco de dados genérico"
+author: "LiaaOnco"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# Introdução
+
+Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 1. **Regressão Linear Simples**: Analisa a relação entre duas variáveis.<br> 2. **Regressão Linear Múltipla**: Explora a relação entre uma variável dependente e múltiplas variáveis independentes.<br> 3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis.<br>
+
+## Carregamento de dados e pacotes
+
+```{r, include = FALSE}
+## Carregamento de pacotes e dados
+library(tidyverse)
+library(ggplot2)
+library(caret)
+library(broom)
+
+# Carregar o banco de dados mtcars
+dados <- mtcars %>%
+  rownames_to_column(var = "carro") %>%
+  mutate(
+    am = factor(am, levels = c(0, 1), labels = c("Automático", "Manual")),
+    cyl = as.factor(cyl),
+    vs = factor(vs, levels = c(0, 1), labels = c("V-shaped", "Straight"))
+  )
+```
+
+You can add options to executable code like this
+
+```{r}
+glimpse(dados)
+```
+
+## Particionamento
+
+```{r}
+set.seed(362)
+
+# Índices aleatórios para particionamento
+train_index <- sample(1:nrow(dados), size = 0.8 * nrow(dados))
+train_data <- dados[train_index, ]
+test_data <- dados[-train_index, ]
+
+# Dimensões dos conjuntos
+dim(train_data)
+dim(test_data)
+```
+
+## Regressão Linear Simples
+
+**Objetivo**: Analisar a relação entre o peso do carro (`wt`) e sua eficiência de combustível (`mpg`).
+
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo
+linear_model <- lm(mpg ~ wt, data = train_data)
+
+# Resumo do modelo
+summary(linear_model)
+
+# Métricas de desempenho
+linear_preds <- test_data %>%
+  mutate(pred = predict(linear_model, newdata = test_data))
+
+linear_metrics <- linear_preds %>%
+  summarise(
+    R2 = cor(mpg, pred)^2,
+    RMSE = sqrt(mean((mpg - pred)^2))
+  )
+
+linear_metrics
+
+
+```
+
+### Visualizaçãoo
+
+```{r}
+ggplot(train_data, aes(x = wt, y = mpg)) +
+  geom_point(color = "darkblue", size = 2, alpha = 0.8) +
+  geom_smooth(method = "lm", color = "firebrick", se = TRUE) +
+  stat_poly_eq(
+    aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE
+  ) +
+  labs(
+    title = "Regressão Linear Simples",
+    x = "Peso do Carro (wt)",
+    y = "Eficiência de Combustível (mpg)"
+  ) +
+  theme_minimal()
+
+```
+
+## Regressão Linear Múltipla
+
+**Objetivo**: Avaliar o impacto de múltiplas variáveis (`wt`, `hp`, `cyl`) na eficiência de combustível (`mpg`).
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo
+multiple_model <- lm(mpg ~ wt + hp + cyl, data = train_data)
+
+# Resumo do modelo
+summary(multiple_model)
+
+# Métricas de desempenho
+multiple_preds <- test_data %>%
+  mutate(pred = predict(multiple_model, newdata = test_data))
+
+multiple_metrics <- multiple_preds %>%
+  summarise(
+    R2 = cor(mpg, pred)^2,
+    RMSE = sqrt(mean((mpg - pred)^2))
+  )
+
+multiple_metrics
+
+
+```
+
+### Visualização dos residuos
+
+```{r}
+residuals <- augment(multiple_model) %>%
+  select(.fitted, .resid)
+
+ggplot(residuals, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  labs(
+    title = "Resíduos da Regressão Múltipla",
+    x = "Valores Ajustados",
+    y = "Resíduos"
+  ) +
+  theme_minimal()
+
+```
+
+## Modelo Não Linear
+
+**Objetivo**: Modelar a relação não linear entre a potência (`hp`) e a eficiência de combustível (`mpg`) usando uma curva polinomial.
+
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo polinomial
+nonlinear_model <- lm(mpg ~ poly(hp, 2), data = train_data)
+
+# Resumo do modelo
+summary(nonlinear_model)
+
+# Previsão e visualização
+dados <- dados %>%
+  mutate(mpg_pred = predict(nonlinear_model, newdata = dados))
+
+```
+
+### Visualização
+
+```{r}
+ggplot(dados, aes(x = hp, y = mpg)) +
+  geom_point(color = "darkblue", size = 2, alpha = 0.7) +
+  geom_line(aes(y = mpg_pred), color = "firebrick", size = 1.2) +
+  labs(
+    title = "Modelo Não Linear: Potência vs Eficiência de Combustível",
+    x = "Potência (hp)",
+    y = "Eficiência de Combustível (mpg)"
+  ) +
+  theme_minimal()
+
+```
+
+### Comparação
+
+```{r, echo = FALSE}
+# Comparação de R²
+# Comparação de R²
+cat("Regressão Linear Simples: R² =", summary(linear_model)$r.squared, "\n")
+cat("Regressão Linear Múltipla: R² =", summary(multiple_model)$r.squared, "\n")
+cat("Modelo Não Linear: R² =", summary(nonlinear_model)$r.squared, "\n")
+
+
+```

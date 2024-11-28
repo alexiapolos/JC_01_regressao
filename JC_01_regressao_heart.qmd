@@ -1,0 +1,221 @@
+---
+title: "Jornal Club 1: Modelos de Regressão"
+author: "LiaaOnco"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+## Introdução
+
+Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 
+1. **Regressão Linear Simples**: Analisa a relação entre duas variáveis.<br> 
+2. **Regressão Linear Múltipla**: Explora a relação entre uma variável dependente e múltiplas variáveis independentes.<br> 
+3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis.<br> 
+
+## Carregamento de dados e pacotes
+
+```{r, include = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(caret)
+library(broom)
+
+# Carregar e processar os dados
+dados <- read.csv("heart.csv") %>% 
+  rename(
+    idade = age,
+    sexo = sex,
+    tipo_dor_toracica = cp,
+    pressao_repouso = trestbps,
+    colesterol = chol,
+    glicose_jejum = fbs,
+    ecg_repouso = restecg,
+    freq_cardiaca_max = thalach,
+    angina_exercicio = exang,
+    depressao_st = oldpeak,
+    incl_st = slope,
+    vasos_coloridos = ca,
+    thal = thal,
+    doenca_cardiaca = target
+  ) %>%
+  mutate(
+    sexo = factor(sexo, levels = c(0, 1), labels = c("Feminino", "Masculino")),
+    tipo_dor_toracica = factor(tipo_dor_toracica, levels = 0:3, 
+                               labels = c("Angina típica", "Angina atípica", "Dor não anginosa", "Assintomático")),
+    glicose_jejum = factor(glicose_jejum, levels = c(0, 1), labels = c("<= 120 mg/dl", "> 120 mg/dl")),
+    ecg_repouso = factor(ecg_repouso, levels = 0:2, 
+                         labels = c("Normal", "Anormalidade ST-T", "Hipertrofia ventricular esquerda")),
+    angina_exercicio = factor(angina_exercicio, levels = c(0, 1), labels = c("Não", "Sim")),
+    incl_st = factor(incl_st, levels = 0:2, 
+                     labels = c("Descendente", "Plano", "Ascendente")),
+    vasos_coloridos = factor(vasos_coloridos, levels = 0:3, 
+                             labels = c("0 vasos", "1 vaso", "2 vasos", "3 vasos")),
+    thal = factor(thal, levels = c(0, 1, 2, 3), 
+                  labels = c("Normal", "Defeito fixo", "Defeito reversível", "Desconhecido")),
+    doenca_cardiaca = factor(doenca_cardiaca, levels = c(0, 1), labels = c("Ausente", "Presente"))
+  )
+
+```
+
+You can add options to executable code like this
+
+```{r}
+glimpse(dados)
+```
+
+## Particionamento
+
+```{r}
+set.seed(362)
+
+# Índices aleatórios para particionamento
+train_index <- sample(1:nrow(dados), size = 0.8 * nrow(dados))
+train_data <- dados[train_index, ]
+test_data <- dados[-train_index, ]
+
+# Dimensões dos conjuntos
+dim(train_data)
+dim(test_data)
+```
+
+## Regressão Linear Simples
+
+**Objetivo**: Analisar a relação entre a pressão arterial em repouso e o colesterol sérico.
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo
+linear_model <- lm(colesterol ~ pressao_repouso, data = train_data)
+
+# Resumo do modelo
+summary(linear_model)
+
+# Métricas de desempenho
+linear_preds <- test_data %>%
+  mutate(pred = predict(linear_model, newdata = test_data))
+
+linear_metrics <- linear_preds %>%
+  summarise(
+    R2 = cor(colesterol, pred)^2,
+    RMSE = sqrt(mean((colesterol - pred)^2))
+  )
+
+linear_metrics
+
+```
+
+### Visualizaçãoo
+
+```{r}
+ggplot(train_data, aes(x = pressao_repouso, y = colesterol)) +
+  geom_point(color = "darkblue", size = 2, alpha = 0.8) +
+  geom_smooth(method = "lm", color = "firebrick", se = TRUE) +
+  stat_poly_eq(
+    aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE
+  ) +
+  labs(
+    title = "Regressão Linear Simples",
+    x = "Pressão Arterial em Repouso",
+    y = "Colesterol Sérico"
+  ) +
+  theme_minimal()
+```
+
+## Regressão Linear Múltipla
+
+**Objetivo**: Avaliar o impacto de idade, sexo, pressão arterial e frequência cardíaca no colesterol.
+
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo
+multiple_model <- lm(colesterol ~ idade + sexo + pressao_repouso + freq_cardiaca_max, data = train_data)
+
+# Resumo do modelo
+summary(multiple_model)
+
+# Métricas de desempenho
+multiple_preds <- test_data %>%
+  mutate(pred = predict(multiple_model, newdata = test_data))
+
+multiple_metrics <- multiple_preds %>%
+  summarise(
+    R2 = cor(colesterol, pred)^2,
+    RMSE = sqrt(mean((colesterol - pred)^2))
+  )
+
+multiple_metrics
+
+```
+
+### Visualização dos residuos
+
+```{r}
+residuals <- augment(multiple_model) %>%
+  select(.fitted, .resid)
+
+ggplot(residuals, aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  labs(
+    title = "Resíduos da Regressão Múltipla",
+    x = "Valores Ajustados",
+    y = "Resíduos"
+  ) +
+  theme_minimal()
+
+```
+
+## Modelo Não Linear
+
+**Objetivo**: Modelar a relação entre idade e frequência cardíaca usando uma curva polinomial.
+
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo polinomial
+nonlinear_model <- lm(freq_cardiaca_max ~ poly(idade, 3), data = dados)
+
+# Resumo do modelo
+summary(nonlinear_model)
+
+# Previsão e visualização
+dados <- dados %>%
+  mutate(freq_cardiaca_pred = predict(nonlinear_model, newdata = dados))
+```
+
+### Visualização
+
+```{r}
+ggplot(dados, aes(x = idade, y = freq_cardiaca_max)) +
+  geom_point(color = "darkblue", size = 2, alpha = 0.7) +
+  geom_line(aes(y = freq_cardiaca_pred), color = "firebrick", size = 1.2) +
+  labs(
+    title = "Modelo Não Linear: Frequência Cardíaca vs Idade",
+    x = "Idade",
+    y = "Frequência Cardíaca Máxima"
+  ) +
+  theme_minimal()
+```
+
+### Comparação
+
+```{r, echo = FALSE}
+# Comparação de R²
+cat("Regressão Linear Simples: R² =", summary(linear_model)$r.squared, "\n")
+cat("Regressão Linear Múltipla: R² =", summary(multiple_model)$r.squared, "\n")
+cat("Modelo Não Linear: R² =", summary(nonlinear_model)$r.squared, "\n")
+
+```
+
