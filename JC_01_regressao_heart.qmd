@@ -1,5 +1,6 @@
 ---
-title: "Jornal Club 1: Modelos de Regressão"
+title: "Jornal Club 1: Modelos de Regressão "
+subtitle: "Banco de dados: doença cardíaca"
 author: "LiaaOnco"
 date: "`r Sys.Date()`"
 output:
@@ -11,13 +12,15 @@ output:
 ## Introdução
 
 Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 
-1. **Regressão Linear Simples**: Analisa a relação entre duas variáveis.<br> 
-2. **Regressão Linear Múltipla**: Explora a relação entre uma variável dependente e múltiplas variáveis independentes.<br> 
-3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis.<br> 
+1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente (quantitativa). <br> 
+2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variável independentes. .<br> 
+3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas,dentre outras.<br> 
 
 ## Carregamento de dados e pacotes
 
 ```{r, include = FALSE}
+
+# Carregar pacotes
 library(tidyverse)
 library(ggplot2)
 library(ggpmisc)
@@ -27,7 +30,7 @@ library(ggpmisc)
 library(caret)
 library(broom)
 
-# Carregar e processar os dados
+# Carregar e limpar os dados
 dados <- read.csv("heart.csv") %>% 
   rename(
     idade = age,
@@ -67,6 +70,7 @@ dados <- read.csv("heart.csv") %>%
 You can add options to executable code like this
 
 ```{r}
+# Verificar a estrutura dos dados
 glimpse(dados)
 ```
 
@@ -75,19 +79,18 @@ glimpse(dados)
 ```{r}
 set.seed(362)
 
-# Índices aleatórios para particionamento
+# Particionamento
 train_index <- sample(1:nrow(dados), size = 0.8 * nrow(dados))
 train_data <- dados[train_index, ]
 test_data <- dados[-train_index, ]
 
-# Dimensões dos conjuntos
 dim(train_data)
 dim(test_data)
 ```
 
 ## Regressão Linear Simples
 
-**Objetivo**: Analisar a relação entre a pressão arterial em repouso e o colesterol sérico.
+**Objetivo**: Analisar a relação entre a pressão arterial em repouso e os níveis de colesterol sérico.
 
 ### Modelagem
 
@@ -98,10 +101,11 @@ linear_model <- lm(colesterol ~ pressao_repouso, data = train_data)
 # Resumo do modelo
 summary(linear_model)
 
-# Métricas de desempenho
+# Previsão
 linear_preds <- test_data %>%
   mutate(pred = predict(linear_model, newdata = test_data))
 
+# Desempenho
 linear_metrics <- linear_preds %>%
   summarise(
     R2 = cor(colesterol, pred)^2,
@@ -118,11 +122,6 @@ linear_metrics
 ggplot(train_data, aes(x = pressao_repouso, y = colesterol)) +
   geom_point(color = "darkblue", size = 2, alpha = 0.8) +
   geom_smooth(method = "lm", color = "firebrick", se = TRUE) +
-  stat_poly_eq(
-    aes(label = paste(..eq.label.., ..adj.rr.label.., sep = "~~~")),
-    formula = y ~ x,
-    parse = TRUE
-  ) +
   labs(
     title = "Regressão Linear Simples",
     x = "Pressão Arterial em Repouso",
@@ -133,8 +132,7 @@ ggplot(train_data, aes(x = pressao_repouso, y = colesterol)) +
 
 ## Regressão Linear Múltipla
 
-**Objetivo**: Avaliar o impacto de idade, sexo, pressão arterial e frequência cardíaca no colesterol.
-
+**Objetivo**: Avaliar o impacto de idade, sexo, pressão arterial em repouso e frequência cardíaca máxima nos níveis de colesterol sérico.
 
 ### Modelagem
 
@@ -145,10 +143,11 @@ multiple_model <- lm(colesterol ~ idade + sexo + pressao_repouso + freq_cardiaca
 # Resumo do modelo
 summary(multiple_model)
 
-# Métricas de desempenho
+# Previsão
 multiple_preds <- test_data %>%
   mutate(pred = predict(multiple_model, newdata = test_data))
 
+# Desempenho
 multiple_metrics <- multiple_preds %>%
   summarise(
     R2 = cor(colesterol, pred)^2,
@@ -162,6 +161,7 @@ multiple_metrics
 ### Visualização dos residuos
 
 ```{r}
+# Verificação dos resíduos
 residuals <- augment(multiple_model) %>%
   select(.fitted, .resid)
 
@@ -180,7 +180,6 @@ ggplot(residuals, aes(x = .fitted, y = .resid)) +
 
 **Objetivo**: Modelar a relação entre idade e frequência cardíaca usando uma curva polinomial.
 
-
 ### Modelagem
 
 ```{r}
@@ -190,7 +189,7 @@ nonlinear_model <- lm(freq_cardiaca_max ~ poly(idade, 3), data = dados)
 # Resumo do modelo
 summary(nonlinear_model)
 
-# Previsão e visualização
+#Previsão 
 dados <- dados %>%
   mutate(freq_cardiaca_pred = predict(nonlinear_model, newdata = dados))
 ```
