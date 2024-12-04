@@ -1,5 +1,5 @@
 ---
-title: "Jornal Club 1: Modelos de Regressão "
+title: "Journal Club 1: Modelos de Regressão "
 subtitle: "Banco de dados: doença cardíaca"
 author: "LiaaOnco"
 date: "`r Sys.Date()`"
@@ -19,7 +19,6 @@ Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados d
 
 # Carregar pacotes
 library(tidyverse)
-library(ggplot2)
 library(ggpmisc)
 library(tidyverse)
 library(ggplot2)
@@ -114,7 +113,7 @@ linear_metrics
 
 ```
 
-### Visualizaçãoo
+### Visualização
 
 ```{r}
 ggplot(train_data, aes(x = pressao_repouso, y = colesterol)) +
@@ -136,7 +135,9 @@ ggplot(train_data, aes(x = pressao_repouso, y = colesterol)) +
 
 ```{r}
 # Ajuste do modelo
-multiple_model <- lm(colesterol ~ idade + sexo + pressao_repouso + freq_cardiaca_max, data = train_data)
+multiple_model <- lm(colesterol ~ idade +
+                      sexo + pressao_repouso + 
+                       freq_cardiaca_max, data = train_data)
 
 # Resumo do modelo
 summary(multiple_model)
@@ -160,21 +161,27 @@ multiple_metrics
 
 ```{r}
 
+# Gerar grid para variáveis contínuas
 grid_data <- expand.grid(
-  idade = seq(min(train_data$idade), max(train_data$idade), length.out = 50),
-  pressao_repouso = seq(min(train_data$pressao_repouso), max(train_data$pressao_repouso), length.out = 50)
+  idade = seq(min(train_data$idade), 
+              max(train_data$idade), 
+              length.out = 50),
+  pressao_repouso = seq(min(train_data$pressao_repouso),
+                        max(train_data$pressao_repouso),
+                        length.out = 50)
 )
 
-# Adicionar sexo ao grid (fixado como "Masculino" ou "Feminino")
-grid_data$sexo <- "Masculino"  # Escolha um nível fixo, ou "Feminino"
+# Adicionar sexo
+grid_data$sexo <- "Masculino"  
 
 # Adicionar uma frequência cardíaca média como exemplo
-grid_data$freq_cardiaca_max <- mean(train_data$freq_cardiaca_max, na.rm = TRUE)
+grid_data$freq_cardiaca_max <- mean(train_data$freq_cardiaca_max,
+                                    na.rm = TRUE)
 
 # Previsão com base nos valores do grid
 grid_data$colesterol_pred <- predict(multiple_model, newdata = grid_data)
 
-# Gráfico interativo 3D com plotly
+# Gráfico interativo 
 fig <- plot_ly()
 
 # Adicionar pontos reais
@@ -199,7 +206,7 @@ fig <- fig %>%
     name = "Modelo"
   )
 
-# Ajustar layout
+# Layout
 fig <- fig %>%
   layout(
     scene = list(

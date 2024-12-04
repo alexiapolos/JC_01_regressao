@@ -19,7 +19,6 @@ Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados d
 
 ## Carregar pacotes 
 library(tidyverse)
-library(ggplot2)
 library(ggpmisc)
 library(tidyverse)
 library(ggplot2)
@@ -27,7 +26,6 @@ library(ggpmisc)
 library(caret)
 library(broom)
 library(plotly)
-
 
 # Carregar o banco de dados mtcars
 dados <- mtcars %>%
@@ -92,7 +90,7 @@ linear_metrics
 
 ```
 
-### Visualizaçãoo
+### Visualização
 
 ```{r}
 ggplot(train_data, aes(x = wt, y = mpg)) +
@@ -145,7 +143,7 @@ grid_data <- expand.grid(
 )
 
 # Adicionar valores fixos para a variável categórica (fator)
-grid_data$cyl <- factor("4", levels = levels(train_data$cyl))  # Escolha um nível válido de 'cyl'
+grid_data$cyl <- factor("4", levels = levels(train_data$cyl))  
 
 # Previsão com base nos valores do grid
 grid_data$mpg_pred <- predict(multiple_model, newdata = grid_data)
@@ -191,7 +189,6 @@ fig
 ### Visualização dos residuos
 
 ```{r}
-
 # Verificação dos resíduos
 residuals <- augment(multiple_model) %>%
   select(.fitted, .resid)
