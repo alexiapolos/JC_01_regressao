@@ -11,10 +11,7 @@ output:
 
 # Introdução
 
-Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 
-1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente (quantitativa). <br> 
-2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variável independentes. .<br> 
-3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas,dentre outras.<br> 
+Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente (quantitativa). <br> 2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variável independentes. .<br> 3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas,dentre outras.<br>
 
 ## Carregamento de dados e pacotes
 
@@ -29,6 +26,8 @@ library(ggplot2)
 library(ggpmisc)
 library(caret)
 library(broom)
+library(plotly)
+
 
 # Carregar o banco de dados mtcars
 dados <- mtcars %>%
@@ -66,7 +65,6 @@ dim(test_data)
 ## Regressão Linear Simples
 
 **Objetivo**: Analisar a relação entre o peso do carro (`wt`) e sua eficiência de combustível (`mpg`).
-
 
 ### Modelagem
 
@@ -137,6 +135,59 @@ multiple_metrics
 
 ```
 
+### Visualização
+
+```{r}
+# Gerar grid para variáveis contínuas
+grid_data <- expand.grid(
+  wt = seq(min(train_data$wt), max(train_data$wt), length.out = 50),
+  hp = seq(min(train_data$hp), max(train_data$hp), length.out = 50)
+)
+
+# Adicionar valores fixos para a variável categórica (fator)
+grid_data$cyl <- factor("4", levels = levels(train_data$cyl))  # Escolha um nível válido de 'cyl'
+
+# Previsão com base nos valores do grid
+grid_data$mpg_pred <- predict(multiple_model, newdata = grid_data)
+
+
+# Gráfico interativo 3D com plotly
+fig <- plot_ly()
+
+# Adicionar pontos reais
+fig <- fig %>%
+  add_markers(
+    x = train_data$wt,
+    y = train_data$hp,
+    z = train_data$mpg,
+    marker = list(color = "red", size = 3),
+    name = "Dados Reais"
+  )
+
+# Adicionar superfície do modelo
+fig <- fig %>%
+  add_surface(
+    x = ~unique(grid_data$wt),
+    y = ~unique(grid_data$hp),
+    z = ~matrix(grid_data$mpg_pred, nrow = 50),
+    colorscale = "Viridis",
+    opacity = 0.7,
+    colorbar = list(title = " ")  
+  )
+
+# Ajustar layout
+fig <- fig %>%
+  layout(
+    scene = list(
+      xaxis = list(title = "Peso (wt)"),
+      yaxis = list(title = "Potência (hp)"),
+      zaxis = list(title = "MPG")
+    )
+  )
+
+fig
+```
+
 ### Visualização dos residuos
 
 ```{r}
@@ -159,7 +210,6 @@ ggplot(residuals, aes(x = .fitted, y = .resid)) +
 ## Modelo Não Linear
 
 **Objetivo**: Modelar a relação não linear entre a potência (`hp`) e a eficiência de combustível (`mpg`) usando uma curva polinomial.
-
 
 ### Modelagem
 

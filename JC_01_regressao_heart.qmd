@@ -11,10 +11,7 @@ output:
 
 ## Introdução
 
-Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 
-1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente (quantitativa). <br> 
-2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variável independentes. .<br> 
-3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas,dentre outras.<br> 
+Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente (quantitativa). <br> 2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variável independentes. .<br> 3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas,dentre outras.<br>
 
 ## Carregamento de dados e pacotes
 
@@ -29,6 +26,7 @@ library(ggplot2)
 library(ggpmisc)
 library(caret)
 library(broom)
+library(plotly)
 
 # Carregar e limpar os dados
 dados <- read.csv("heart.csv") %>% 
@@ -158,6 +156,62 @@ multiple_metrics
 
 ```
 
+### Visualização
+
+```{r}
+
+grid_data <- expand.grid(
+  idade = seq(min(train_data$idade), max(train_data$idade), length.out = 50),
+  pressao_repouso = seq(min(train_data$pressao_repouso), max(train_data$pressao_repouso), length.out = 50)
+)
+
+# Adicionar sexo ao grid (fixado como "Masculino" ou "Feminino")
+grid_data$sexo <- "Masculino"  # Escolha um nível fixo, ou "Feminino"
+
+# Adicionar uma frequência cardíaca média como exemplo
+grid_data$freq_cardiaca_max <- mean(train_data$freq_cardiaca_max, na.rm = TRUE)
+
+# Previsão com base nos valores do grid
+grid_data$colesterol_pred <- predict(multiple_model, newdata = grid_data)
+
+# Gráfico interativo 3D com plotly
+fig <- plot_ly()
+
+# Adicionar pontos reais
+fig <- fig %>%
+  add_markers(
+    x = train_data$idade,
+    y = train_data$pressao_repouso,
+    z = train_data$colesterol,
+    marker = list(color = "red", size = 3),
+    name = "Dados Reais"
+  )
+
+# Adicionar superfície do modelo
+fig <- fig %>%
+  add_surface(
+    x = ~unique(grid_data$idade),
+    y = ~unique(grid_data$pressao_repouso),
+    z = ~matrix(grid_data$colesterol_pred, nrow = 50),
+    colorscale = "Viridis",
+    opacity = 0.7,
+    colorbar = list(title = " "), 
+    name = "Modelo"
+  )
+
+# Ajustar layout
+fig <- fig %>%
+  layout(
+    scene = list(
+      xaxis = list(title = "Idade"),
+      yaxis = list(title = "Pressão de Repouso"),
+      zaxis = list(title = "Colesterol")
+    )
+  )
+
+fig
+```
+
 ### Visualização dos residuos
 
 ```{r}
@@ -217,4 +271,3 @@ cat("Regressão Linear Múltipla: R² =", summary(multiple_model)$r.squared, "\n
 cat("Modelo Não Linear: R² =", summary(nonlinear_model)$r.squared, "\n")
 
 ```
-
