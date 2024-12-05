@@ -11,7 +11,7 @@ output:
 
 # Introdução
 
-Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente (quantitativa). <br> 2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variável independentes. .<br> 3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas, dentre outras.<br>
+Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados de saúde: <br> 1. **Regressão Linear Simples**: Visa estabelecer uma relação linear entre uma variável dependente e uma variável independente. <br> 2. **Regressão Linear Múltipla**: Visa estabelecer uma relação linear entre uma variável dependente e múltiplas variáveis independentes. .<br> 3. **Modelos Não Lineares**: Investigam padrões não lineares entre as variáveis. Podem incluir funções polinomiais, exponenciais, logarítmicas, dentre outras.<br>
 
 ## Carregamento de dados e pacotes
 
