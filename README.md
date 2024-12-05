@@ -49,8 +49,8 @@ ou <br>
 
 ## 📧 Contato
 Caso tenha dúvidas ou sugestões, entre em contato: <br>
-Responsável: Alexia Polo <br>
-E-mail: alexia.siqueira@hospitaldeamor.com.br
+**Responsável:** Alexia Polo, Analista de Dados <br>
+**E-mail:** alexia.siqueira@hospitaldeamor.com.br
 
 ## 📚 Material aula teórica
 [![Abrir Material no Canva](https://img.shields.io/badge/Canva-Abrir_Material-blue?style=for-the-badge&logo=canva)](https://www.canva.com/design/DAGXHINM0jU/nadDoUi4OcilT5aOBGL_TQ/view?utm_content=DAGXHINM0jU&utm_campaign=designshare&utm_medium=link&utm_source=editor)
