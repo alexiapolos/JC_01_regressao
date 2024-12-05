@@ -1,6 +1,7 @@
 # JC_01_Regressao: Laboratório de Modelos de Regressão
 
-Bem-vindo ao repositório  do **1º Journal Club do LIAAOnco**. Este repositório contém os códigos e os dados utilizados na aula prática com o tema **Modelos de Regressão**. Temos uma aplicação em dados genéricos (banco 'mtcars'). e uma aplicação em dados de saúde (doenças cardíacas).
+Bem-vindo ao repositório  do **1º Journal Club do LIAAOnco**. <br> 
+Este repositório contém os códigos e os dados utilizados na aula prática com o tema **Modelos de Regressão**.Temos uma aplicação em dados genéricos (banco 'mtcars'). e uma aplicação em dados de saúde (doenças cardíacas).
 
 ## 🧠 **Objetivo**
 Capacitar LiaaOnkers a:
@@ -45,5 +46,10 @@ Capacitar LiaaOnkers a:
 Caso tenha dúvidas ou sugestões, entre em contato: <br>
 Responsável: Alexia Polo <br>
 E-mail: alexia.siqueira@hospitaldeamor.com.br
+
+## 📚 Material aula teórica
+🔗 https://www.canva.com/design/DAGXHINM0jU/nadDoUi4OcilT5aOBGL_TQ/view?utm_content=DAGXHINM0jU&utm_campaign=designshare&utm_medium=link&utm_source=editor). <br> 
+
+### Aproveitem! 🤖
 
 
