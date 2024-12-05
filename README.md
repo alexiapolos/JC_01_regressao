@@ -39,9 +39,13 @@ Capacitar LiaaOnkers a:
   - `plotly`
   
 ### Instalação:
-1. Clone este repositório:
+-  Clone este repositório:
    ```bash
    git clone https://github.com/seu-usuario/JC_01_regressao.git
+ou <br>
+- Baixe a pasta .zip em seu computador
+
+### Aproveitem! 🤖
 
 ## 📧 Contato
 Caso tenha dúvidas ou sugestões, entre em contato: <br>
@@ -49,8 +53,8 @@ Responsável: Alexia Polo <br>
 E-mail: alexia.siqueira@hospitaldeamor.com.br
 
 ## 📚 Material aula teórica
-🔗 https://www.canva.com/design/DAGXHINM0jU/nadDoUi4OcilT5aOBGL_TQ/view?utm_content=DAGXHINM0jU&utm_campaign=designshare&utm_medium=link&utm_source=editor). <br> 
+🔗 https://www.canva.com/design/DAGXHINM0jU/nadDoUi4OcilT5aOBGL_TQ/view?utm_content=DAGXHINM0jU&utm_campaign=designshare&utm_medium=link&utm_source=editor 
 
-### Aproveitem! 🤖
+
 
 
