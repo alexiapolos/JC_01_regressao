@@ -2,7 +2,7 @@
 
 Bem-vindo ao repositório 1ª aula prática do **Journal Club do LIAAOnco**. <br> 
 Este repositório contém os códigos e os dados utilizados na aula com o tema **Modelos de Regressão**. <br> 
-Temos uma aplicação em dados genéricos (banco 'mtcars'). e uma aplicação em dados de saúde (doenças cardíacas).
+Temos uma aplicação dos conceitos em dados genéricos (banco 'mtcars'), e uma aplicação em dados de saúde (doenças cardíacas).
 
 ## 🧠 **Objetivo**
 Capacitar LiaaOnkers a:
