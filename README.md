@@ -1,4 +1,4 @@
-# JC_01_Regressao: Modelos de Regressão
+# Aula Prática Journal Club LiiaOnco: Modelos de Regressão
 
 Bem-vindo ao repositório 1ª aula prática do **Journal Club do LIAAOnco**. <br> 
 Este repositório contém os códigos e os dados utilizados na aula com o tema **Modelos de Regressão**. <br> 
