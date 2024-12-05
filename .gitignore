@@ -1,1 +1,3 @@
-teste_old/
+*.Rdata
+*.Rhistory
+*.html
