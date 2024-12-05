@@ -42,8 +42,8 @@ Capacitar LiaaOnkers a:
    git clone https://github.com/seu-usuario/JC_01_regressao.git
 
 ## 📧 Contato
-Caso tenha dúvidas ou sugestões, entre em contato:
-Responsável: Alexia Polo
+Caso tenha dúvidas ou sugestões, entre em contato: <br>
+Responsável: Alexia Polo <br>
 E-mail: alexia.siqueira@hospitaldeamor.com.br
 
 
