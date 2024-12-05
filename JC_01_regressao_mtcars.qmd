@@ -37,13 +37,36 @@ dados <- mtcars %>%
   )
 ```
 
-You can add options to executable code like this
+Estrutura do banco de dados
 
 ```{r}
-
 # Verificar a estrutura dos dados
 glimpse(dados)
 ```
+
+Sobre as variáveis:
+
+-   **mpg** = Milhas por galão (do inglês *Miles/(US) gallon)*;
+
+-   **cyl** = Número de cilindos (do inglês *Number of cylinders)*;
+
+-   **disp** = Deslocamento do motor (cu.in.)(do inglês *Displacement)*;
+
+-   **hp** = Cavalos de potência (do inglês *Gross horsepower)*;
+
+-   **drat** = Razão do eixo traseiro (do inglês *Rear axle ratio*);
+
+-   **wt** = Peso (1000 lbs)(do inglês *Weight*);
+
+-   **qsec** = Tempo para percorrer 1/4 de uma milha (do inglês *1/4 mile time)*;
+
+-   **vs** = Motor (0 = V-shaped, 1 = straight)(do ingês *Engine*);
+
+-   **am** = Transmissão (0 = automatic, 1 = manual)(do inglês *Transmission)*;
+
+-   **gear** = Número de eixos dianteiros (do inglês *Number of forward gears*);
+
+-   **carb** = Número de carburadores (do inglês *Number of carburetors)*.
 
 ## Particionamento
 
@@ -107,7 +130,7 @@ ggplot(train_data, aes(x = wt, y = mpg)) +
 
 ## Regressão Linear Múltipla
 
-**Objetivo**: Avaliar o impacto de múltiplas variáveis (`wt`, `hp`, `cyl`) na eficiência de combustível (`mpg`).
+**Objetivo**: Avaliar o impacto das variáveis peso do carro (`wt)`, potência( `hp)` e número de cilindros ( `cyl`) na eficiência de combustível (`mpg`).
 
 ### Modelagem
 

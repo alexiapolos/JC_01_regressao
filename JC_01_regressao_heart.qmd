@@ -64,8 +64,7 @@ dados <- read.csv("heart.csv") %>%
 
 ```
 
-You can add options to executable code like this
-
+Estrutura do banco de dados 
 ```{r}
 # Verificar a estrutura dos dados
 glimpse(dados)
@@ -129,15 +128,14 @@ ggplot(train_data, aes(x = pressao_repouso, y = colesterol)) +
 
 ## Regressão Linear Múltipla
 
-**Objetivo**: Avaliar o impacto de idade, sexo, pressão arterial em repouso e frequência cardíaca máxima nos níveis de colesterol sérico.
+**Objetivo**: Avaliar o impacto de idade, sexo e  pressão arterial em repouso nos níveis de colesterol sérico.
 
 ### Modelagem
 
 ```{r}
 # Ajuste do modelo
 multiple_model <- lm(colesterol ~ idade +
-                      sexo + pressao_repouso + 
-                       freq_cardiaca_max, data = train_data)
+                      sexo + pressao_repouso, data = train_data)
 
 # Resumo do modelo
 summary(multiple_model)
