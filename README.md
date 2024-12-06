@@ -2,25 +2,26 @@
 
 Bem-vindo ao repositório 1ª aula prática do **Journal Club do LIAAOnco**. <br> 
 Este repositório contém os códigos e os dados utilizados na aula com o tema **Modelos de Regressão**. <br> 
-Temos uma aplicação dos conceitos em dados genéricos (banco 'mtcars'), e uma aplicação em dados de saúde (doenças cardíacas).
+Aplicaremos na prática os conceitos de **Regressão Linear** e **Regressão Logística Binária** em um banco de dados público de câncer de mama.
+
+--- 
 
 ## 🧠 **Objetivo**
 Capacitar LiaaOnkers a:
-- Compreender e aplicar os conceitos de modelos de regressão em diferentes contextos.
-- Analisar a relação entre variáveis preditoras e variável resposta, e interpretá-la no contexto do problemas.
+- Compreender e aplicar os conceitos de regressão linear simples e regressão logística binária.
+- Analisar a relação entre variáveis preditoras (como características de tumores) e a variável resposta (diagnóstico de malignidade).
+- Interpretar os resultados destess modelos 
+
 ---
 
 ## 📂 **Estrutura do Repositório**
 
 ### Arquivos Principais:
-- **`JC_01_regressao_heart.qmd`**  
-  Contém o código para a análise de dados de saúde relacionados ao coração (base `heart.csv`), utilizando modelos de regressão linear simples, múltipla e não linear para explorar relações entre variáveis.
+- **`JC_01_regressao_cancer.qmd`**  
+Contém o código para a análise de dados.
 
-- **`JC_01_regressao_mtcars.qmd`**  
-  Contém o código para a análise de dados do conjunto `mtcars` (dados genéricos de automóveis). Também utiliza modelos de regressão linear simples, múltipla e não linear para explorar relações entre variáveis.
-
-- **`heart.csv`**  
-  Conjunto de dados de saúde utilizado no script `JC_01_regressao_heart.qmd`.
+- **`breast-cancer.csv`**  
+  Conjunto de dados aplicado.
 
 - **`.gitignore`**  
   Arquivo para ignorar arquivos temporários ou locais gerados durante o desenvolvimento dos modelos.
@@ -35,9 +36,10 @@ Capacitar LiaaOnkers a:
   - `tidyverse`
   - `ggplot2`
   - `caret`
-  - `Metrics`
-  - `plotly`
-  
+  - `pROC`
+  - `broom`
+  - `car`
+
 ### Instalação:
 -  Clone este repositório:
    ```bash
@@ -45,6 +47,12 @@ Capacitar LiaaOnkers a:
 ou <br>
 - Baixe a pasta .zip em seu computador
 
+- Após clonar ou baixar o repositório, instale os pacotes necessários diretamente no R:
+  
+ ```R
+ install.packages(c("tidyverse", "ggplot2", "caret", "pROC", "broom", "plotly", "car"))
+
+ ```
 ### Aproveitem! 🤖
 
 ## 📧 Contato
