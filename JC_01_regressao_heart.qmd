@@ -20,7 +20,6 @@ Nesta aula prática, aplicaremos três tipos de modelos de regressão em dados d
 # Carregar pacotes
 library(tidyverse)
 library(ggpmisc)
-library(tidyverse)
 library(ggplot2)
 library(ggpmisc)
 library(caret)

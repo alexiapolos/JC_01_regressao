@@ -1,0 +1,224 @@
+---
+title: "Journal Club 1: Regressão Logística Binária"
+subtitle: "Banco de dados: Breast cancer dataset"
+author: "LiaaOnco"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# Introdução
+
+Nesta etapa aula prática, abordaremos a aplicação do modelo de regressão
+logística binaria no conjunto de dados **Breast Cancer Dataset**.<br>
+
+**Fonte**: Wisconsin Diagnostic Breast Cancer (WDBC) dataset <br>
+**Disponível**: [Kaggle - Breast Cancer
+Dataset](https://kaggle.com/datasets/uciml/breast-cancer-wisconsin-data).
+
+## Carregamento de pacotes e dados
+
+```{r, include = FALSE }
+
+## Carregar pacotes 
+library(tidyverse)
+library(caret)
+library(broom)
+library(pROC)
+```
+
+```{r}
+# Carregar o banco de dados previamente tratado
+dados <- read.csv("breast-cancer.csv")
+
+# Transformar a variável 'diagnosis' em binária (1 = maligno, 0 = benigno)
+dados <- dados %>%
+  mutate(diagnosis = ifelse(diagnosis == "M", 1, 0))
+
+```
+
+## Estrutura do banco de dados
+
+```{r}
+# Verificar a estrutura dos dados
+glimpse(dados)
+```
+
+### Variável dependente (resposta)
+
+'diagnosis': Indica se o nódulo é maligno ou benigno.<br>
+
+### Variáveis independentes (explicativas)
+
+Características calculadas a partir da imagem digitalizada de punção
+aspirativa por agulha fina de uma massa mamária. <br>
+
+Dez características numéricas contínuas foram calculadas para cada
+núcleo celular:<br> a) Radius: Média das distâncias do centro até os
+pontos no perímetro.<br> b) Texture: Desvio padrão dos valores de escala
+de cinza.<br> c) Perimeter: Perímetro.<br> d) Area: Área.<br> e)
+Smoothness: Variação local nos comprimentos do raio.<br> f) Compactness:
+perımetro\^2 = área - 1 <br> g) Concavity: Severidade das porções
+côncavas do contorno.<br> h) Concave points: Número de porções côncavas
+no contorno.<br> i) Symmetry: Simetria.<br> j) Fractal dimension:
+Aproximação da "coastline" - 1 <br>
+
+Para cada imagem, foram calculados a média (mean), o erro padrão (se) e
+o "pior" (worst) valor dessas características, resultando em 30
+atributos.
+
+## Particionamento dos dados
+
+Dividiremos os dados em dois conjuntos:
+
+-   Treinamento: 80% dos dados.
+-   Teste: 20% dos dados.
+
+```{r}
+set.seed(362)
+
+# Criar índices para o particionamento
+train_index <- createDataPartition(dados$diagnosis, p = 0.8, list = FALSE)
+
+# Conjuntos de treinamento e teste
+train_data <- dados[train_index, ]
+test_data <- dados[-train_index, ]
+
+# Verificar dimensões dos conjuntos
+dim(train_data)
+dim(test_data)
+```
+
+## Regressão Logistica Binária
+
+**Objetivo:** Construir um modelo de regressão logística para prever a
+probabilidade de um tumor ser maligno (Y=1) com base em características
+clínicas.
+
+### Modelagem
+
+```{r}
+# Ajuste do modelo
+logistic_model <- glm(diagnosis ~ radius_mean + texture_mean + perimeter_mean, 
+                      data = train_data, 
+                      family = binomial)
+
+# Resumo do modelo
+summary(logistic_model)
+
+```
+
+O modelo foi ajustado. Ressalta-se que: <br>
+
+-   'radius_mean' tem um efeito negativo significativo na probabilidade
+    de malignidade.
+-   'texture_mean' e 'perimeter_mean' apresentam efeitos positivos
+    significativos na probabilidade de malignidade.
+
+### Interpretação do coeficiente
+
+Os coeficientes da regressão logística podem ser interpretadose ser
+interpretados como o impacto das variáveis independentes na razão de
+chance (odds ratio). <br> Valores de 𝛽\> 0 indicam aumento na
+probabilidade de Y=1 (M), enquanto valores de β \< 0 indicam redução na
+probabilidade de Y=1 (M).
+
+```{r}
+# Calcular odds ratio e intervalos de confiança
+exp(cbind(Odds_Ratio = coef(logistic_model), confint(logistic_model)))
+```
+
+-   Para cada unidade em 'perimeter_mean', a razão de chances de
+    malignidade aumenta em 3 vezes.\<br\<
+
+-   'radius_mean' reduz a chance de malignidade, enquanto 'texture_mean'
+    aumenta ligeiramente essa probabilidade.
+
+### Predição e avaliação do modelo
+
+```{r}
+# Previsão
+test_data <- test_data %>%
+  mutate(predicted_prob = predict(logistic_model, newdata = test_data, type = "response"),
+         predicted_class = ifelse(predicted_prob > 0.5, 1, 0))
+
+ggplot(test_data, aes(x = radius_mean, y = diagnosis)) +
+  geom_point(alpha = 0.6, color = "darkblue", aes(y = predicted_prob)) +  # Valores previstos
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), color = "firebrick") +
+  labs(
+    title = "Função Logística",
+    x = "Radius Mean",
+    y = "Probabilidade de Malignidade"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 14, face = "bold")
+  )
+```
+
+### Matriz de confusão e métricas de avaliação
+
+```{r}
+# Criar a matriz de confusão
+conf_matrix <- confusionMatrix(as.factor(test_data$predicted_class), as.factor(test_data$diagnosis))
+
+# Exibir as métricas
+conf_matrix
+
+```
+
+O modelo apresentou bom desempenho geral, atingindo uma acurácia de
+90,27% no conjunto de teste, com uma sensibilidade de 92,54% e uma
+especificidade de 86,96%.
+
+### Visualização
+
+```{r}
+# Converter a tabela da matriz de confusão para um dataframe
+conf_matrix_df <- as.data.frame(conf_matrix$table)
+
+# Plotar a matriz de confusão
+ggplot(conf_matrix_df, aes(x = Prediction, y = Reference, fill = Freq)) +
+  geom_tile(alpha = 0.8) +
+  scale_fill_gradient(low = "#cdd3e0", high = "#032263") +
+  geom_text(aes(label = Freq), color = "black", size = 6) +
+  labs(
+    title = "Matriz de Confusão",
+    x = "Classe Predita",
+    y = "Classe Real",
+    fill = "Frequência"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 14, face = "bold")
+  )
+
+```
+
+### Curva ROC e AUC
+
+A **curva ROC** mede a capacidade do modelo de distinguir entre classes,
+enquanto a **AUC** (área sob a curva) quantifica essa capacidade.
+
+```{r}
+# Gerar a curva ROC
+roc_curve <- roc(test_data$diagnosis, test_data$predicted_prob)
+
+# Plotar a curva ROC
+plot(roc_curve, col = "darkblue", main = "Curva ROC")
+abline(a = 0, b = 1, col = "firebrick", lty = 2)
+
+# Exibir o valor da AUC
+auc(roc_curve)
+
+```
+
+A curva ROC mostrou uma AUC de 0,9708, indicando uma capacidade
+discriminatória do modelo em diferenciar nódulos benignos de malignos.
