@@ -49,7 +49,7 @@ ou <br>
 
 ## 📧 Contato
 Caso tenha dúvidas ou sugestões, entre em contato: <br>
-**Responsável:** Aleéxia Polo, Analista de Dados <br>
+**Responsável:** Aléxia Polo, Analista de Dados <br>
 **E-mail:** alexia.siqueira@hospitaldeamor.com.br
 
 ## 📚 Material aula teórica
